@@ -1,0 +1,366 @@
+[
+  {
+    "id": "q001",
+    "text": "The best way out is always through.",
+    "author": "Robert Frost",
+    "themes": ["perseverance", "resilience", "courage"],
+    "slot": "morning"
+  },
+  {
+    "id": "q002",
+    "text": "Every new beginning comes from some other beginning's end.",
+    "author": "Seneca",
+    "themes": ["beginnings", "change", "hope"],
+    "slot": "morning"
+  },
+  {
+    "id": "q003",
+    "text": "It does not matter how slowly you go as long as you do not stop.",
+    "author": "Confucius",
+    "themes": ["perseverance", "motivation", "growth"],
+    "slot": "morning"
+  },
+  {
+    "id": "q004",
+    "text": "Gratitude turns what we have into enough.",
+    "author": "Anonymous",
+    "themes": ["gratitude", "calm"],
+    "slot": "evening"
+  },
+  {
+    "id": "q005",
+    "text": "What we achieve inwardly will change outer reality.",
+    "author": "Plutarch",
+    "themes": ["growth", "reflection", "change"],
+    "slot": "evening"
+  },
+  {
+    "id": "q006",
+    "text": "You don't have to control your thoughts. You just have to stop letting them control you.",
+    "author": "Dan Millman",
+    "themes": ["stress", "calm", "focus"],
+    "slot": "any"
+  },
+  {
+    "id": "q007",
+    "text": "Fall seven times, stand up eight.",
+    "author": "Japanese Proverb",
+    "themes": ["resilience", "perseverance", "failure"],
+    "slot": "morning"
+  },
+  {
+    "id": "q008",
+    "text": "The wound is the place where the light enters you.",
+    "author": "Rumi",
+    "themes": ["loss", "growth", "hope"],
+    "slot": "evening"
+  },
+  {
+    "id": "q009",
+    "text": "Courage is not the absence of fear, but the triumph over it.",
+    "author": "Nelson Mandela",
+    "themes": ["courage", "resilience", "motivation"],
+    "slot": "morning"
+  },
+  {
+    "id": "q010",
+    "text": "Almost everything will work again if you unplug it for a few minutes, including you.",
+    "author": "Anne Lamott",
+    "themes": ["rest", "stress", "health"],
+    "slot": "evening"
+  },
+  {
+    "id": "q011",
+    "text": "The only way to do great work is to love what you do.",
+    "author": "Steve Jobs",
+    "themes": ["work", "motivation", "success"],
+    "slot": "morning"
+  },
+  {
+    "id": "q012",
+    "text": "And once the storm is over, you won't remember how you made it through.",
+    "author": "Haruki Murakami",
+    "themes": ["resilience", "uncertainty", "hope"],
+    "slot": "evening"
+  },
+  {
+    "id": "q013",
+    "text": "Tell me, what is it you plan to do with your one wild and precious life?",
+    "author": "Mary Oliver",
+    "themes": ["reflection", "motivation", "change"],
+    "slot": "evening"
+  },
+  {
+    "id": "q014",
+    "text": "Start where you are. Use what you have. Do what you can.",
+    "author": "Arthur Ashe",
+    "themes": ["beginnings", "motivation", "focus"],
+    "slot": "morning"
+  },
+  {
+    "id": "q015",
+    "text": "Grief is just love with no place to go.",
+    "author": "Jamie Anderson",
+    "themes": ["loss", "love", "reflection"],
+    "slot": "evening"
+  },
+  {
+    "id": "q016",
+    "text": "The cure for anything is salt water: sweat, tears, or the sea.",
+    "author": "Isak Dinesen",
+    "themes": ["health", "stress", "calm"],
+    "slot": "any"
+  },
+  {
+    "id": "q017",
+    "text": "He who has a why to live can bear almost any how.",
+    "author": "Friedrich Nietzsche",
+    "themes": ["resilience", "motivation", "perseverance"],
+    "slot": "morning"
+  },
+  {
+    "id": "q018",
+    "text": "We must let go of the life we have planned, so as to accept the one that is waiting for us.",
+    "author": "Joseph Campbell",
+    "themes": ["change", "uncertainty", "growth"],
+    "slot": "evening"
+  },
+  {
+    "id": "q019",
+    "text": "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+    "author": "Winston Churchill",
+    "themes": ["success", "failure", "courage"],
+    "slot": "morning"
+  },
+  {
+    "id": "q020",
+    "text": "Rest when you're weary. Refresh and renew yourself. You will then be able to do more.",
+    "author": "Ralph Marston",
+    "themes": ["rest", "health", "calm"],
+    "slot": "evening"
+  },
+  {
+    "id": "q021",
+    "text": "In the middle of difficulty lies opportunity.",
+    "author": "Albert Einstein",
+    "themes": ["resilience", "growth", "hope"],
+    "slot": "morning"
+  },
+  {
+    "id": "q022",
+    "text": "The people who are crazy enough to think they can change the world are the ones who do.",
+    "author": "Rob Siltanen",
+    "themes": ["motivation", "courage", "change"],
+    "slot": "morning"
+  },
+  {
+    "id": "q023",
+    "text": "Be patient with yourself. Self-growth is tender; it's holy ground.",
+    "author": "Stephen Covey",
+    "themes": ["growth", "calm", "reflection"],
+    "slot": "evening"
+  },
+  {
+    "id": "q024",
+    "text": "What you are afraid to do is a clear indication of the next thing you need to do.",
+    "author": "Ralph Waldo Emerson",
+    "themes": ["courage", "growth", "uncertainty"],
+    "slot": "morning"
+  },
+  {
+    "id": "q025",
+    "text": "Love is not finding someone to live with. It's finding someone you can't live without.",
+    "author": "Rafael Ortiz",
+    "themes": ["love", "relationships"],
+    "slot": "any"
+  },
+  {
+    "id": "q026",
+    "text": "Family is not an important thing. It's everything.",
+    "author": "Michael J. Fox",
+    "themes": ["relationships", "love", "gratitude"],
+    "slot": "evening"
+  },
+  {
+    "id": "q027",
+    "text": "You will never always be motivated. You have to learn to be disciplined.",
+    "author": "Anonymous",
+    "themes": ["perseverance", "focus", "motivation"],
+    "slot": "morning"
+  },
+  {
+    "id": "q028",
+    "text": "Doubt kills more dreams than failure ever will.",
+    "author": "Suzy Kassem",
+    "themes": ["uncertainty", "failure", "motivation"],
+    "slot": "morning"
+  },
+  {
+    "id": "q029",
+    "text": "Nothing diminishes anxiety faster than action.",
+    "author": "Walter Anderson",
+    "themes": ["stress", "courage", "focus"],
+    "slot": "morning"
+  },
+  {
+    "id": "q030",
+    "text": "Take a deep breath. It's just a bad day, not a bad life.",
+    "author": "Anonymous",
+    "themes": ["stress", "calm", "resilience"],
+    "slot": "evening"
+  },
+  {
+    "id": "q031",
+    "text": "The expert in anything was once a beginner.",
+    "author": "Helen Hayes",
+    "themes": ["beginnings", "growth", "work"],
+    "slot": "morning"
+  },
+  {
+    "id": "q032",
+    "text": "Comparison is the thief of joy.",
+    "author": "Theodore Roosevelt",
+    "themes": ["reflection", "gratitude", "calm"],
+    "slot": "evening"
+  },
+  {
+    "id": "q033",
+    "text": "When you can't control what's happening, challenge yourself to control the way you respond.",
+    "author": "Anonymous",
+    "themes": ["uncertainty", "resilience", "calm"],
+    "slot": "any"
+  },
+  {
+    "id": "q034",
+    "text": "Hope is being able to see that there is light despite all of the darkness.",
+    "author": "Desmond Tutu",
+    "themes": ["hope", "resilience", "loss"],
+    "slot": "evening"
+  },
+  {
+    "id": "q035",
+    "text": "Your calm mind is the ultimate weapon against your challenges.",
+    "author": "Bryant McGill",
+    "themes": ["calm", "stress", "focus"],
+    "slot": "any"
+  },
+  {
+    "id": "q036",
+    "text": "Discipline is choosing between what you want now and what you want most.",
+    "author": "Abraham Lincoln",
+    "themes": ["focus", "perseverance", "success"],
+    "slot": "morning"
+  },
+  {
+    "id": "q037",
+    "text": "Healing is not linear.",
+    "author": "Anonymous",
+    "themes": ["health", "loss", "growth"],
+    "slot": "evening"
+  },
+  {
+    "id": "q038",
+    "text": "A river cuts through rock not because of its power but its persistence.",
+    "author": "James N. Watkins",
+    "themes": ["perseverance", "resilience", "motivation"],
+    "slot": "morning"
+  },
+  {
+    "id": "q039",
+    "text": "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+    "author": "Nelson Mandela",
+    "themes": ["failure", "resilience", "courage"],
+    "slot": "morning"
+  },
+  {
+    "id": "q040",
+    "text": "Sometimes the most productive thing you can do is rest.",
+    "author": "Mark Black",
+    "themes": ["rest", "health", "calm"],
+    "slot": "evening"
+  },
+  {
+    "id": "q041",
+    "text": "Change is the end result of all true learning.",
+    "author": "Leo Buscaglia",
+    "themes": ["change", "growth", "reflection"],
+    "slot": "evening"
+  },
+  {
+    "id": "q042",
+    "text": "You are allowed to be both a masterpiece and a work in progress simultaneously.",
+    "author": "Sophia Bush",
+    "themes": ["growth", "gratitude", "hope"],
+    "slot": "evening"
+  },
+  {
+    "id": "q043",
+    "text": "Do the best you can until you know better. Then when you know better, do better.",
+    "author": "Maya Angelou",
+    "themes": ["growth", "failure", "motivation"],
+    "slot": "morning"
+  },
+  {
+    "id": "q044",
+    "text": "The two most important days in your life are the day you are born and the day you find out why.",
+    "author": "Mark Twain",
+    "themes": ["reflection", "motivation", "beginnings"],
+    "slot": "evening"
+  },
+  {
+    "id": "q045",
+    "text": "Work hard in silence, let your success be your noise.",
+    "author": "Frank Ocean",
+    "themes": ["work", "success", "focus"],
+    "slot": "morning"
+  },
+  {
+    "id": "q046",
+    "text": "Difficult roads often lead to beautiful destinations.",
+    "author": "Zig Ziglar",
+    "themes": ["hope", "perseverance", "uncertainty"],
+    "slot": "morning"
+  },
+  {
+    "id": "q047",
+    "text": "Don't let yesterday take up too much of today.",
+    "author": "Will Rogers",
+    "themes": ["reflection", "change", "focus"],
+    "slot": "morning"
+  },
+  {
+    "id": "q048",
+    "text": "You can't go back and change the beginning, but you can start where you are and change the ending.",
+    "author": "C.S. Lewis",
+    "themes": ["change", "beginnings", "hope"],
+    "slot": "any"
+  },
+  {
+    "id": "q049",
+    "text": "Surround yourself with those who see greatness within you, even when you don't see it yourself.",
+    "author": "Edmund Lee",
+    "themes": ["relationships", "love", "motivation"],
+    "slot": "evening"
+  },
+  {
+    "id": "q050",
+    "text": "Slow progress is still progress.",
+    "author": "Anonymous",
+    "themes": ["growth", "perseverance", "hope"],
+    "slot": "any"
+  },
+  {
+    "id": "q051",
+    "text": "Breathe. You're going to be okay. Breathe and remember that you've been in this place before.",
+    "author": "Anonymous",
+    "themes": ["calm", "stress", "resilience"],
+    "slot": "evening"
+  },
+  {
+    "id": "q052",
+    "text": "The harder the conflict, the greater the triumph.",
+    "author": "George Washington",
+    "themes": ["courage", "success", "perseverance"],
+    "slot": "morning"
+  }
+]
