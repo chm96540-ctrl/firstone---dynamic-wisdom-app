@@ -145,8 +145,12 @@ def test_cli_end_to_end(tmp_path, monkeypatch, cards_page, capsys):
     cli.main(base + ["embed"])
     cli.main(base + ["eval", "--views", "2"])
     cli.main(base + ["prices", "--out", str(tmp_path / "release")])
+    photo = tmp_path / "photo.jpg"
+    synthetic_card(1).save(photo)  # stands in for a photo of sv3-125
+    cli.main(base + ["match", str(photo), "-k", "1"])
 
     out = capsys.readouterr().out
+    assert "1. " in out and "Charizard ex  125/197  Obsidian Flames  [sv3-125]" in out
     assert "fetched 2 sets, 2 cards" in out
     assert "embedded 2 cards" in out
     assert "top-5 accuracy   100.0%" in out

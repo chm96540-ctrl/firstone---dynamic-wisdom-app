@@ -48,6 +48,7 @@ cardvault fetch --set sv3        # one set to start; omit --set for everything (
 cardvault images                 # reference images (build-time only, never shipped)
 cardvault embed --embedder tiny  # baseline; then try --embedder clip
 cardvault eval  --embedder tiny  # top-1 / top-5 accuracy on synthetic phone photos
+cardvault match my_card.jpg      # top-5 guesses for your own photo (crop it to the card first)
 cardvault prices                 # build/release/prices.json.gz (+ .sig if PRICE_SIGNING_KEY set)
 cardvault keygen                 # one-time: signing keypair for price files
 ```

@@ -4,7 +4,8 @@
     cardvault images   [--limit N]             download reference images (build-time only)
     cardvault embed    [--embedder tiny|clip]  fingerprint every cached image into the catalog
     cardvault eval     [--embedder ...]        accuracy test on synthetic phone photos
-    cardvault prices   [--out DIR]             52-week summary -> catalog + signed prices.json.gz
+    cardvault match    PHOTO ...               top-5 guesses for your own (cropped) card photos
+    cardvault prices   [--out DIR]            52-week summary -> catalog + signed prices.json.gz
     cardvault keygen                           new Ed25519 keypair for signing price files
 """
 
@@ -91,6 +92,28 @@ def cmd_eval(args: argparse.Namespace) -> None:
     print(res.report())
 
 
+def cmd_match(args: argparse.Namespace) -> None:
+    from PIL import Image  # noqa: PLC0415
+
+    from .embed import top_k  # noqa: PLC0415
+
+    catalog = db.connect(args.catalog)
+    embedder = get_embedder(args.embedder)
+    ids, mat = db.load_embeddings(catalog, embedder.name)
+    if not ids:
+        sys.exit(f"no embeddings for {embedder.name} - run `cardvault embed` first")
+    for path in args.photos:
+        q = embedder.embed([Image.open(path)])
+        idx, sims = top_k(q, mat, k=args.k)
+        print(path)
+        for rank, (i, s) in enumerate(zip(idx[0], sims[0]), 1):
+            r = catalog.execute(
+                "SELECT c.name, c.number, s.name AS set_name, s.printed_total FROM cards c "
+                "JOIN sets s ON s.id = c.set_id WHERE c.id = ?", (ids[i],)).fetchone()
+            print(f"  {rank}. {s:.3f}  {r['name']}  {r['number']}/{r['printed_total']}  "
+                  f"{r['set_name']}  [{ids[i]}]")
+
+
 def cmd_prices(args: argparse.Namespace) -> None:
     history = db.connect_history(args.history)
     summary = prices.summarize(history)
@@ -147,6 +170,12 @@ def main(argv: list[str] | None = None) -> None:
     v.add_argument("--severity", type=float, default=1.0)
     v.add_argument("--seed", type=int, default=0)
     v.set_defaults(fn=cmd_eval)
+
+    m = sub.add_parser("match", help="identify card photos (crop the photo to the card first)")
+    m.add_argument("photos", nargs="+")
+    m.add_argument("--embedder", default="tiny")
+    m.add_argument("-k", type=int, default=5)
+    m.set_defaults(fn=cmd_match)
 
     pr = sub.add_parser("prices")
     pr.add_argument("--out", default="build/release")
