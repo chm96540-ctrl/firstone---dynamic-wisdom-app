@@ -1,0 +1,56 @@
+# Weekly price snapshot.
+#
+# The running price history lives as an asset on the "data-latest" release, so the
+# repo never fills up with data. Each run: download history -> add this week's
+# snapshot -> recompute 52-week averages -> publish signed prices.json.gz + catalog.
+#
+# Secrets: POKEMONTCG_API_KEY (optional, raises rate limits),
+#          PRICE_SIGNING_KEY (from `cardvault keygen`; without it files are unsigned).
+name: Weekly prices
+
+on:
+  schedule:
+    - cron: "17 9 * * 1"   # Mondays 09:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pipeline
+    env:
+      GH_TOKEN: ${{ github.token }}
+      POKEMONTCG_API_KEY: ${{ secrets.POKEMONTCG_API_KEY }}
+      PRICE_SIGNING_KEY: ${{ secrets.PRICE_SIGNING_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+
+      - name: Restore price history
+        run: |
+          mkdir -p build
+          gh release download data-latest --pattern price_history.sqlite --dir build \
+            || echo "no previous history - starting a new baseline"
+
+      - name: Fetch cards and this week's prices
+        run: cardvault fetch
+
+      - name: Build 52-week summary and signed price file
+        run: cardvault prices --out build/release
+
+      - name: Publish
+        run: |
+          gh release view data-latest >/dev/null 2>&1 \
+            || gh release create data-latest --title "Latest card data" \
+                 --notes "Rolling release updated weekly by the Weekly prices workflow."
+          gh release upload data-latest --clobber \
+            build/price_history.sqlite build/catalog.sqlite \
+            build/release/prices.json.gz build/release/prices.sha256 \
+            $( [ -f build/release/prices.sig ] && echo build/release/prices.sig )
