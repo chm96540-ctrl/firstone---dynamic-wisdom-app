@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guitar Tuner</title>
+<style>
+  :root {
+    --bg: #f6f5f2; --card: #ffffff; --text: #1d1d1f; --muted: #6e6e73;
+    --line: #dcdad5; --good: #1f9d55; --warn: #d97706; --bad: #dc2626; --accent: #2563eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141416; --card: #1f1f23; --text: #f2f2f4; --muted: #9a9aa2;
+            --line: #34343a; --good: #34d399; --warn: #fbbf24; --bad: #f87171; --accent: #60a5fa; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         display: flex; justify-content: center; padding: 24px 16px; min-height: 100vh; }
+  main { width: 100%; max-width: 440px; }
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 16px; text-align: center; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+  .note { font-size: 5rem; font-weight: 700; text-align: center; line-height: 1; transition: color .15s; }
+  .note sub { font-size: 1.5rem; font-weight: 500; color: var(--muted); }
+  .freq { text-align: center; color: var(--muted); margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .meter { position: relative; height: 56px; margin: 28px 0 8px; }
+  .scale { position: absolute; inset: 0; display: flex; justify-content: space-between; align-items: flex-end; }
+  .tick { width: 2px; height: 12px; background: var(--line); }
+  .tick.mid { height: 28px; background: var(--good); }
+  .zone { position: absolute; left: 45%; width: 10%; bottom: 0; height: 100%;
+          background: color-mix(in srgb, var(--good) 12%, transparent); border-radius: 6px; }
+  .needle { position: absolute; left: 50%; bottom: 0; width: 4px; height: 100%; margin-left: -2px;
+            background: var(--muted); border-radius: 2px; transition: left .08s linear, background .15s; }
+  .labels { display: flex; justify-content: space-between; color: var(--muted); font-size: .8rem; }
+  .status { text-align: center; margin-top: 12px; font-weight: 600; min-height: 1.4em; }
+  .strings { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 20px; }
+  .strings button { padding: 12px 0; border-radius: 10px; border: 1px solid var(--line);
+                    background: var(--card); color: var(--text); font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .strings button.active { border-color: var(--good); color: var(--good); }
+  .hint { color: var(--muted); font-size: .8rem; text-align: center; margin-top: 8px; }
+  .start { display: block; width: 100%; margin-top: 20px; padding: 14px; border: 0; border-radius: 12px;
+           background: var(--accent); color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .start.on { background: var(--muted); }
+  .err { color: var(--bad); text-align: center; margin-top: 12px; font-size: .9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Guitar Tuner</h1>
+  <div class="card">
+    <div class="note" id="note">–</div>
+    <div class="freq" id="freq">Tap Start and play a string</div>
+
+    <div class="meter">
+      <div class="zone"></div>
+      <div class="scale" id="scale"></div>
+      <div class="needle" id="needle"></div>
+    </div>
+    <div class="labels"><span>−50¢</span><span>0</span><span>+50¢</span></div>
+    <div class="status" id="status"></div>
+
+    <div class="strings" id="strings"></div>
+    <div class="hint">Tap a string to hear its reference tone</div>
+
+    <button class="start" id="start">Start tuner</button>
+    <div class="err" id="err"></div>
+  </div>
+</main>
+
+<script>
+const NOTES = ["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"];
+// Standard tuning, low to high (MIDI numbers)
+const STRINGS = [
+  { name: "E", midi: 40 }, { name: "A", midi: 45 }, { name: "D", midi: 50 },
+  { name: "G", midi: 55 }, { name: "B", midi: 59 }, { name: "e", midi: 64 },
+];
+const midiToFreq = m => 440 * Math.pow(2, (m - 69) / 12);
+
+const $ = id => document.getElementById(id);
+const noteEl = $("note"), freqEl = $("freq"), needle = $("needle"),
+      statusEl = $("status"), startBtn = $("start"), errEl = $("err");
+
+// Build meter ticks
+for (let i = 0; i <= 10; i++) {
+  const t = document.createElement("div");
+  t.className = "tick" + (i === 5 ? " mid" : "");
+  $("scale").appendChild(t);
+}
+
+// String buttons (play reference tone)
+const stringBtns = STRINGS.map(s => {
+  const b = document.createElement("button");
+  b.textContent = s.name;
+  b.title = NOTES[s.midi % 12] + (Math.floor(s.midi / 12) - 1) + " · " + midiToFreq(s.midi).toFixed(2) + " Hz";
+  b.onclick = () => playTone(midiToFreq(s.midi));
+  $("strings").appendChild(b);
+  return b;
+});
+
+let ctx, analyser, stream, buf, running = false, rafId;
+let smoothedCents = 0, lastMidi = null, silentFrames = 0;
+
+function getCtx() {
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === "suspended") ctx.resume();
+  return ctx;
+}
+
+function playTone(freq) {
+  const c = getCtx();
+  const osc = c.createOscillator(), gain = c.createGain();
+  osc.type = "triangle";
+  osc.frequency.value = freq;
+  const now = c.currentTime;
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 2);
+  osc.connect(gain).connect(c.destination);
+  osc.start(now);
+  osc.stop(now + 2);
+}
+
+// Autocorrelation pitch detection
+function detectPitch(data, sampleRate) {
+  const n = data.length;
+  let rms = 0;
+  for (let i = 0; i < n; i++) rms += data[i] * data[i];
+  rms = Math.sqrt(rms / n);
+  if (rms < 0.01) return -1; // too quiet
+
+  // Trim to the region between the first and last points above threshold
+  let start = 0, end = n - 1;
+  const thr = 0.2;
+  for (let i = 0; i < n / 2; i++) if (Math.abs(data[i]) < thr) { start = i; break; }
+  for (let i = 1; i < n / 2; i++) if (Math.abs(data[n - i]) < thr) { end = n - i; break; }
+  const x = data.slice(start, end);
+  const len = x.length;
+
+  // Only search lags for ~60 Hz .. ~1000 Hz
+  const minLag = Math.floor(sampleRate / 1000);
+  const maxLag = Math.min(Math.floor(sampleRate / 60), len - 1);
+  const c = new Float32Array(maxLag + 1);
+  for (let lag = 0; lag <= maxLag; lag++) {
+    let sum = 0;
+    for (let i = 0; i < len - lag; i++) sum += x[i] * x[i + lag];
+    c[lag] = sum;
+  }
+
+  // Skip the initial downslope, then find the highest peak
+  let d = minLag;
+  while (d < maxLag && c[d] > c[d + 1]) d++;
+  let best = -1, bestVal = -Infinity;
+  for (let i = d; i <= maxLag; i++) if (c[i] > bestVal) { bestVal = c[i]; best = i; }
+  if (best <= 0 || bestVal < c[0] * 0.3) return -1; // weak periodicity
+
+  // Parabolic interpolation for sub-sample accuracy
+  let T = best;
+  if (best > 0 && best < maxLag) {
+    const a = c[best - 1], b = c[best], g = c[best + 1];
+    const denom = a - 2 * b + g;
+    if (denom !== 0) T = best + 0.5 * (a - g) / denom;
+  }
+  return sampleRate / T;
+}
+
+function update() {
+  analyser.getFloatTimeDomainData(buf);
+  const f = detectPitch(buf, ctx.sampleRate);
+
+  if (f > 0) {
+    silentFrames = 0;
+    const midiFloat = 69 + 12 * Math.log2(f / 440);
+    const midi = Math.round(midiFloat);
+    const cents = (midiFloat - midi) * 100;
+    if (midi !== lastMidi) smoothedCents = cents;
+    smoothedCents = smoothedCents * 0.7 + cents * 0.3;
+    lastMidi = midi;
+    render(midi, f, smoothedCents);
+  } else if (++silentFrames > 30) {
+    renderIdle();
+  }
+  rafId = requestAnimationFrame(update);
+}
+
+function colorFor(cents) {
+  const a = Math.abs(cents);
+  return a <= 5 ? "var(--good)" : a <= 15 ? "var(--warn)" : "var(--bad)";
+}
+
+function render(midi, f, cents) {
+  const col = colorFor(cents);
+  noteEl.innerHTML = NOTES[((midi % 12) + 12) % 12] + "<sub>" + (Math.floor(midi / 12) - 1) + "</sub>";
+  noteEl.style.color = col;
+  freqEl.textContent = f.toFixed(1) + " Hz · " + (cents >= 0 ? "+" : "") + cents.toFixed(0) + "¢";
+  const pos = 50 + Math.max(-50, Math.min(50, cents));
+  needle.style.left = pos + "%";
+  needle.style.background = col;
+  statusEl.style.color = col;
+  statusEl.textContent = Math.abs(cents) <= 5 ? "In tune ✓" : cents < 0 ? "Too low — tighten ↑" : "Too high — loosen ↓";
+  stringBtns.forEach((b, i) => b.classList.toggle("active", STRINGS[i].midi === midi));
+}
+
+function renderIdle() {
+  noteEl.textContent = "–";
+  noteEl.style.color = "";
+  freqEl.textContent = "Listening… play a string";
+  needle.style.left = "50%";
+  needle.style.background = "";
+  statusEl.textContent = "";
+  stringBtns.forEach(b => b.classList.remove("active"));
+}
+
+async function start() {
+  errEl.textContent = "";
+  try {
+    const c = getCtx();
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+    });
+    const src = c.createMediaStreamSource(stream);
+    analyser = c.createAnalyser();
+    analyser.fftSize = 4096;
+    buf = new Float32Array(analyser.fftSize);
+    src.connect(analyser);
+    running = true;
+    startBtn.textContent = "Stop tuner";
+    startBtn.classList.add("on");
+    renderIdle();
+    update();
+  } catch (e) {
+    errEl.textContent = "Couldn't access the microphone. Please allow mic access and try again.";
+  }
+}
+
+function stop() {
+  running = false;
+  cancelAnimationFrame(rafId);
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  startBtn.textContent = "Start tuner";
+  startBtn.classList.remove("on");
+  renderIdle();
+  freqEl.textContent = "Tap Start and play a string";
+}
+
+startBtn.onclick = () => (running ? stop() : start());
+</script>
+</body>
+</html>
