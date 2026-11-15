@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#141416">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tuner">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Guitar Tuner</title>
 <style>
   :root {
@@ -16,7 +24,10 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text);
          font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-         display: flex; justify-content: center; padding: 24px 16px; min-height: 100vh; }
+         display: flex; justify-content: center; min-height: 100vh; min-height: 100dvh;
+         padding: calc(24px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right))
+                  calc(24px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+         -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
   main { width: 100%; max-width: 440px; }
   h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 16px; text-align: center; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
@@ -223,6 +234,7 @@ async function start() {
     buf = new Float32Array(analyser.fftSize);
     src.connect(analyser);
     running = true;
+    keepAwake();
     startBtn.textContent = "Stop tuner";
     startBtn.classList.add("on");
     renderIdle();
@@ -236,6 +248,7 @@ function stop() {
   running = false;
   cancelAnimationFrame(rafId);
   if (stream) stream.getTracks().forEach(t => t.stop());
+  if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
   startBtn.textContent = "Start tuner";
   startBtn.classList.remove("on");
   renderIdle();
@@ -243,6 +256,23 @@ function stop() {
 }
 
 startBtn.onclick = () => (running ? stop() : start());
+
+// Keep the screen on while tuning
+let wakeLock = null;
+async function keepAwake() {
+  try { if ("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen"); } catch (e) {}
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && running) {
+    if (ctx && ctx.state === "suspended") ctx.resume();
+    keepAwake();
+  }
+});
+
+// Install as an app / work offline
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
 </script>
 </body>
 </html>
